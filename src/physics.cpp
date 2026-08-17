@@ -1116,6 +1116,60 @@ void InitializeWaterField() {
   }
 }
 
+enum {
+  c_waterScriptGridSize = 128,
+  c_waterRetailGridWidth = 128,
+  c_waterRetailGridHeight = 64
+};
+
+const SumoF32 c_waterInactiveBaseHeight = -2000.0f;
+
+SumoF32 g_waterOriginX;
+
+SumoF32 g_waterOriginZ;
+
+SumoF32 g_waterCellSize = 1.0f;
+
+SumoF32 g_waterInverseCellSize = 1.0f;
+
+void InitializeWaterFieldScripted(SumoF32 centerX, SumoF32 centerZ,
+                                  SumoF32 halfExtent, SumoF32 baseHeight) {
+  g_waterGridWidth = c_waterScriptGridSize;
+  g_waterGridHeight = c_waterScriptGridSize;
+  g_waterOriginX = centerX - halfExtent;
+  g_waterOriginZ = centerZ - halfExtent;
+  g_waterCellSize =
+      (halfExtent + halfExtent) / (SumoF32)(c_waterScriptGridSize - 1);
+  g_waterInverseCellSize = 1.0f / g_waterCellSize;
+  g_waterBaseHeight = baseHeight;
+  g_waterHeightCorrection = 0.0f;
+  g_waterFieldActive = 1;
+
+  SumoS32 cellCount = g_waterGridWidth * g_waterGridHeight;
+  g_waterHeights.Resize(cellCount);
+  g_waterVelocities.Resize(cellCount);
+  for (SumoS32 index = 0; index < cellCount; ++index) {
+    SumoF32 wave = (SumoF32)sin(index * g_randomHalf);
+    g_waterHeights[index] =
+        wave * g_waterInitialWaveAmplitude + g_waterBaseHeight;
+    g_waterVelocities[index] = 0.0f;
+  }
+}
+
+void ResetWaterField() {
+  g_waterFieldActive = 0;
+  g_waterBaseHeight = c_waterInactiveBaseHeight;
+  g_waterHeightCorrection = 0.0f;
+  g_waterHeights.Resize(0);
+  g_waterVelocities.Resize(0);
+  g_waterGridWidth = c_waterRetailGridWidth;
+  g_waterGridHeight = c_waterRetailGridHeight;
+  g_waterOriginX = 0.0f;
+  g_waterOriginZ = 0.0f;
+  g_waterCellSize = 1.0f;
+  g_waterInverseCellSize = 1.0f;
+}
+
 extern SumoS32 g_screenTintLevel;
 extern FloatVector g_waterHeights;
 extern FloatVector g_waterVelocities;
@@ -1189,8 +1243,10 @@ void GameBox::ApplyWaterInteraction() {
     return;
   if (!(g_waterBaseHeight + 3.0f > position.y))
     return;
-  SumoS32 gridX = (SumoS32)((SumoF64)g_gameInverseSimulationStep * position.x);
-  SumoS32 gridZ = (SumoS32)((SumoF64)g_gameInverseSimulationStep * position.z);
+  SumoS32 gridX = (SumoS32)((SumoF64)g_waterInverseCellSize *
+                            (position.x - g_waterOriginX));
+  SumoS32 gridZ = (SumoS32)((SumoF64)g_waterInverseCellSize *
+                            (position.z - g_waterOriginZ));
   if (gridX >= g_waterGridWidth || gridX < 0 || gridZ >= g_waterGridHeight ||
       gridZ < 0)
     return;

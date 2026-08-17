@@ -54,6 +54,8 @@ void ParserBuiltinRandom(ParserBuiltinCall *call);
 void ParserBuiltinTurnTo(ParserBuiltinCall *call);
 void ParserBuiltinMan(ParserBuiltinCall *call);
 void ParserBuiltinCutPlane(ParserBuiltinCall *call);
+void ParserBuiltinWater(ParserBuiltinCall *call);
+void ParserBuiltinWaterArea(ParserBuiltinCall *call);
 
 // VTABLE: SUMO 0x0042c3c0
 // VTABLE: EDITOR 0x0042c3c0
@@ -132,6 +134,7 @@ public:
 };
 
 extern BuiltinFunctionEntry g_gameBuiltinFunctions[6];
+extern BuiltinFunctionEntry g_gameWaterBuiltinFunctions[2];
 extern GameExpressionParser g_gameParser;
 extern bool g_gameParserInitialized;
 

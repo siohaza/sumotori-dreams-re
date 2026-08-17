@@ -485,7 +485,8 @@ enum {
   c_renderModeDot3 = 1,
   c_renderModeAlbedo = 2,
   c_renderModeText = 3,
-  c_renderModeLine = 4
+  c_renderModeLine = 4,
+  c_renderModeWater = 5
 };
 
 static const char *const c_vertexShaderSource =
@@ -525,6 +526,8 @@ static const char *const c_fragmentShaderSource =
     "  } else if (uMode == 3) {\n"
     "    oColor = vec4(vColor.rgb, texture(uTexture, vTexCoord).a * "
     "vColor.a);\n"
+    "  } else if (uMode == 5) {\n"
+    "    oColor = vColor;\n"
     "  } else {\n"
     "    oColor = vec4(vColor.rgb, 1.0);\n"
     "  }\n"
@@ -1092,7 +1095,7 @@ void FinishGameWaterVertices(SumoS32 triangleCount) {
   glBufferSubData(GL_ARRAY_BUFFER, 0, (GLsizeiptr)triangleCount * 3 * 24,
                   s_waterVertexScratch);
   glBindVertexArray(s_streamTextVertexArray);
-  glUniform1i(s_uniformMode, c_renderModeFlat);
+  glUniform1i(s_uniformMode, c_renderModeWater);
   glEnable(GL_BLEND);
   glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
   glDisable(GL_CULL_FACE);

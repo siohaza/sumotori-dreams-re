@@ -207,6 +207,10 @@ BuiltinFunctionEntry g_gameBuiltinFunctions[6] = {
     {"man", 3, ParserBuiltinMan},
     {"breakability", 1, ParserBuiltinBreakability}};
 
+BuiltinFunctionEntry g_gameWaterBuiltinFunctions[2] = {
+    {"water", 1, ParserBuiltinWater},
+    {"waterarea", 4, ParserBuiltinWaterArea}};
+
 // FUNCTION: SUMO 0x00404b7f
 // FUNCTION: EDITOR 0x00404ba1
 ParserValue ExpressionParser::ConvertScalar(SumoF64 value) {
@@ -327,6 +331,43 @@ void ParserBuiltinCutPlane(ParserBuiltinCall *call) {
   if (g_currentBox != 0) {
     g_currentBox->CutPlane(*call->arguments[0], call->arguments[1]->x);
   }
+}
+
+extern const SumoF32 g_gameLevelArenaExtent;
+
+void ParserBuiltinWater(ParserBuiltinCall *call) {
+  ParserValue *output = call->output;
+  output->z = 0.0f;
+  output->y = 0.0f;
+  output->x = 0.0f;
+
+  SumoF32 height = call->arguments[0]->x;
+  if (!(height > -10000.0f && height < 10000.0f))
+    return;
+  InitializeWaterFieldScripted(0.0f, 0.0f, g_gameLevelArenaExtent, height);
+}
+
+void ParserBuiltinWaterArea(ParserBuiltinCall *call) {
+  ParserValue *output = call->output;
+  output->z = 0.0f;
+  output->y = 0.0f;
+  output->x = 0.0f;
+
+  SumoF32 centerX = call->arguments[0]->x;
+  SumoF32 centerZ = call->arguments[1]->x;
+  SumoF32 halfExtent = call->arguments[2]->x;
+  SumoF32 height = call->arguments[3]->x;
+  if (!(centerX > -10000.0f && centerX < 10000.0f))
+    return;
+  if (!(centerZ > -10000.0f && centerZ < 10000.0f))
+    return;
+  if (!(halfExtent > 0.0f))
+    return;
+  if (halfExtent > 1000.0f)
+    halfExtent = 1000.0f;
+  if (!(height > -10000.0f && height < 10000.0f))
+    return;
+  InitializeWaterFieldScripted(centerX, centerZ, halfExtent, height);
 }
 
 // FUNCTION: SUMO 0x00404f8f
@@ -596,6 +637,7 @@ void InitializeGameParser() {
   if (!g_gameParserInitialized) {
     g_gameParser.InitializeStandardLibrary();
     g_gameParser.AddBuiltinFunctions(6, g_gameBuiltinFunctions);
+    g_gameParser.AddBuiltinFunctions(2, g_gameWaterBuiltinFunctions);
     g_gameParserInitialized = true;
   }
 }
