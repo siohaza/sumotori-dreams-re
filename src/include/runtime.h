@@ -211,6 +211,9 @@ void LimitDynamicBoxes();
 void RenderGameBoxes(SumoS32);
 void ApplyPairedAngularImpulse(GameBox **boxes, Vector3 &impulse);
 void ApplyWaterInteractionToMovingBoxes();
+void InitializeWaterFieldScripted(SumoF32 centerX, SumoF32 centerZ,
+                                  SumoF32 halfExtent, SumoF32 baseHeight);
+void ResetWaterField();
 SumoS32 UpdateHiddenGameScreen();
 void UpdateGameMenuScreen(SumoU8 drawOverlay);
 void StartGameRound();

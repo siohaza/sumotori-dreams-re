@@ -667,6 +667,7 @@ GameMan *CreateGameMen() {
 // FUNCTION: SUMO 0x00410a5c
 void StartGameRound() {
   SetGameCursorVisible(0);
+  ResetWaterField();
   g_gameEditorControlMode = 4;
   RestartGameMusic(6);
 
@@ -1217,6 +1218,7 @@ void LoadGameLevel(char *source) {
   g_levelLoadState[1] = -1;
   g_levelLoadState[2] = -1;
   g_levelLoadState[3] = -1;
+  ResetWaterField();
 
   ResetGameBoxes();
   memset(g_gameContactObjects, 0, sizeof(g_gameContactObjects));
@@ -4261,6 +4263,7 @@ SumoS32 InitializeGameRuntimeState() {
   }
 
   g_screenTintLevel = 0;
+  ResetWaterField();
   SetGameCursorVisible(1);
   g_gameMouseX = -1;
   g_levelLoadState[4] = 10;

@@ -2312,7 +2312,9 @@ SumoS32 WriteGameScreenshot() {
 extern FloatVector g_waterHeights;
 extern SumoS32 g_waterGridWidth;
 extern SumoS32 g_waterGridHeight;
-extern SumoF32 g_gameSimulationStep;
+extern SumoF32 g_waterOriginX;
+extern SumoF32 g_waterOriginZ;
+extern SumoF32 g_waterCellSize;
 extern Vector3 g_gameCameraWorldPosition;
 extern const SumoF32 g_gameArenaHalfExtent;
 extern const SumoF32 g_freeCameraPositionRecordScale;
@@ -2346,13 +2348,13 @@ void RenderWaterSurface() {
     for (SumoS32 column = 0; column < width - 1; ++column) {
       Vector3 normal = MakeVector3(
           g_waterHeights[cellIndex] - g_waterHeights[cellIndex + 1],
-          g_gameSimulationStep,
+          g_waterCellSize,
           g_waterHeights[cellIndex] - g_waterHeights[cellIndex + width]);
       normal.Normalize();
-      Vector3 position =
-          MakeVector3((SumoF32)((SumoF64)column * g_gameSimulationStep),
-                      g_waterHeights[cellIndex],
-                      (SumoF32)((SumoF64)rowBase * g_gameSimulationStep));
+      Vector3 position = MakeVector3(
+          (SumoF32)((SumoF64)column * g_waterCellSize + g_waterOriginX),
+          g_waterHeights[cellIndex],
+          (SumoF32)((SumoF64)rowBase * g_waterCellSize + g_waterOriginZ));
       Vector3 view = position - g_gameCameraWorldPosition;
       SumoF32 reflectionScale =
           (SumoF32)(((SumoF64)view.z * normal.z + (SumoF64)view.y * normal.y +
@@ -2368,10 +2370,12 @@ void RenderWaterSurface() {
         *(SumoU32 *)(cursor + 0xc) = color;
         Vector3 cornerPosition =
             MakeVector3((SumoF32)((SumoF64)(column + c_columnOffsets[corner]) *
-                                  g_gameSimulationStep),
+                                      g_waterCellSize +
+                                  g_waterOriginX),
                         g_waterHeights[cellIndex + heightSteps[corner]],
                         (SumoF32)((SumoF64)(row + c_rowOffsets[corner]) *
-                                  g_gameSimulationStep));
+                                      g_waterCellSize +
+                                  g_waterOriginZ));
         *(Vector3 *)cursor = cornerPosition;
         *(SumoF32 *)(cursor + 0x10) = 0.0f;
         *(SumoF32 *)(cursor + 0x14) = 0.0f;
